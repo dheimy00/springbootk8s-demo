@@ -57,10 +57,3 @@ spec:
                 name: spring-boot-service
                 port:
                   number: 80
-          - path: /system-v2
-            pathType: Prefix
-            backend:
-              service:
-                name: spring-boot-service
-                port:
-                  number: 80
