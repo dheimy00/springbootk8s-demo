@@ -1,0 +1,61 @@
+kind delete cluster --name system-clusters
+
+# Criar cluster Kind
+kind create cluster --name system-clusters --config kind-config.yaml
+
+Install NGINX Ingress Controller in kind
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+
+# Criar namespace
+kubectl create namespace demo-namespace
+
+Carregar imagens locais
+#FRONTEND
+docker build -t frontend-app-v1:1.0 .
+kind load docker-image frontend-app-v1:1.0 --name system-clusters
+
+#BACKEND
+docker build -t urlshortener-app-v1:1.0 .
+kind load docker-image urlshortener-app-v1:1.0 --name system-clusters
+
+kubectl apply -f kubernetes.yaml
+
+kubectl get pods,svc,ingress -n demo-namespace
+
+kubectl get all -n demo-namespace
+
+kubectl get ingress -n demo-namespace
+
+kubectl get pods -n ingress-nginx
+
+kubectl get svc -n demo-namespace
+
+
+# Verificar logs
+kubectl logs -n demo-namespace deploy/urlshortener-app-v1
+#
+kubectl describe deploy spring-boot-app-v2 -n demo-namespace | grep Image
+
+
+docker build -t frontend-app-v1:1.1 .
+kind load docker-image frontend-app-v1:1.1 --name system-clusters
+kubectl set image deployment/frontend-app-v1 frontend-app=frontend-app-v1:1.2 -n demo-namespace
+
+
+kubectl run mysql-client --rm -it --image=mysql:8.0 -n store-namespace -- bash
+mysql -h mysql.store-namespace.svc.cluster.local -P 3306 -u productuser -p productsdb
+
+
+
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm install ingress-nginx ingress-nginx/ingress-nginx --version 3.34.0
+kubectl get po -n ingress-nginx
+
+docker build -t frontend-app-v1:1.0 .
+kind load docker-image frontend-app-v1:1.0 --name system-clusters
+kubectl rollout restart deploy/frontend-app-v1 -n demo-namespace
+
+
+
+
+
